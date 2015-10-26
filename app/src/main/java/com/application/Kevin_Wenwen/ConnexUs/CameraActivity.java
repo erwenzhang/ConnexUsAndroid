@@ -1,7 +1,17 @@
 package com.application.Kevin_Wenwen.ConnexUs;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,15 +22,9 @@ import android.widget.FrameLayout;
 import android.widget.Button;
 import android.view.View;
 import android.hardware.Camera.PictureCallback;
-import java.io.File;
 import android.util.Log;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Environment;
-import java.util.Date;
 import android.view.KeyEvent;
 
 public class CameraActivity extends Activity {
@@ -30,6 +34,7 @@ public class CameraActivity extends Activity {
     private String imageFile;
     Context context = this;
     private int takePictureClicked = 0;
+    private List<byte[]> photoDataList = new ArrayList<byte[]>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,73 +104,13 @@ public class CameraActivity extends Activity {
     }
 
     private PictureCallback mPicture = new PictureCallback() {
-
-        @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            System.out.println("CALL BACK BEING CALLED");
-            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            imageFile = pictureFile.toString();
-            System.out.println(imageFile);
-            if (pictureFile == null){
-                Log.d(TAG, "Error creating media file, check storage permissions");
-                //Log.d( "Error creating media file, check storage permissions: " +
-                // e.getMessage());
-                return;
-            }
-
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
-            } catch (FileNotFoundException e) {
-                Log.d(TAG, "File not found: " + e.getMessage());
-            } catch (IOException e) {
-                Log.d(TAG, "Error accessing file: " + e.getMessage());
-            }
+            // new SaveImageTask().execute(data);
+            photoDataList.add(data);
+            Log.d(TAG, "onPictureTaken - jpeg");
         }
     };
 
-    public static final int MEDIA_TYPE_IMAGE = 1;
-    public static final int MEDIA_TYPE_VIDEO = 2;
-    /** Create a file Uri for saving an image or video */
-    private static Uri getOutputMediaFileUri(int type){
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
-
-    /** Create a File for saving an image or video */
-    private static File getOutputMediaFile(int type){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
-
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
-        } else if(type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_"+ timeStamp + ".mp4");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
-    }
 
     @Override
     public void onBackPressed() {
@@ -193,12 +138,17 @@ public class CameraActivity extends Activity {
             mCamera.release();
             mCamera = null;
         }
+
+        byte[] data = photoDataList.get(photoDataList.size() - 1);
+        new SaveImageTask().execute(data);
+
+
         Intent returnIntent = new Intent();
-        String streamName = getIntent().getStringExtra("stream_name");
-        returnIntent.putExtra("stream_name", streamName);
-        returnIntent.putExtra("imageFile", imageFile);
-        setResult(RESULT_OK, returnIntent);
-        finish();
+        // String streamName = getIntent().getStringExtra("stream_name");
+        // returnIntent.putExtra("stream_name", streamName);
+        // returnIntent.putExtra("imageFile", imageFile);
+        // setResult(RESULT_OK, returnIntent);
+        // finish();
     }
 
     public void returnStreams(View view){
@@ -220,5 +170,45 @@ public class CameraActivity extends Activity {
 //        setResult(RESULT_OK,returnIntent);
 //        finish();
 
+    }
+
+    private class SaveImageTask extends AsyncTask<byte[], Void, Void> {
+
+        @Override
+        protected Void doInBackground(byte[]... data) {
+            FileOutputStream outStream = null;
+
+            // Write to SD Card
+            try {
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File (sdCard.getAbsolutePath() + "/ConnexUs");
+                dir.mkdirs();
+
+                String fileName = String.format("%d.jpg", System.currentTimeMillis());
+                File outFile = new File(dir, fileName);
+
+                outStream = new FileOutputStream(outFile);
+                outStream.write(data[0]);
+                outStream.flush();
+                outStream.close();
+
+                Log.d(TAG, "onPictureTaken - wrote bytes: " + data.length + " to " + outFile.getAbsolutePath());
+
+                refreshGallery(outFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+            }
+            return null;
+        }
+
+    }
+
+    private void refreshGallery(File file) {
+        Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        mediaScanIntent.setData(Uri.fromFile(file));
+        sendBroadcast(mediaScanIntent);
     }
 }

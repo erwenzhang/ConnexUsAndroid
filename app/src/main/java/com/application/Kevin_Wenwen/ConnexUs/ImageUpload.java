@@ -126,8 +126,7 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == PICK_IMAGE && data != null && data.getData() != null)
-            || (requestCode == USE_CAMERA && resultCode == RESULT_OK && data != null)) {
+        if (requestCode == PICK_IMAGE && data != null && data.getData() != null) {
             Uri selectedImage = data.getData();
 
             // User had pick an image.
