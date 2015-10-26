@@ -22,12 +22,11 @@
             />
 
         <Button
-            android:id="@+id/view_all_images"
+            android:id="@+id/use_camera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Use camera"/>
-            //android:onClick="viewAllImages"
-            />
+            android:text="Use camera"
+            android:onClick="useCamera" />
 
         <ImageView
             android:layout_width="wrap_content"

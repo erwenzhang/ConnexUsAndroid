@@ -40,6 +40,7 @@ import java.io.ByteArrayOutputStream;
 public class ImageUpload extends ActionBarActivity implements LocationListener{
     public final static String EXTRA_MESSAGE = "MESSAGE IN";
     private static final int PICK_IMAGE = 1;
+    private static final int USE_CAMERA = 2;
     private String email;
     private String stream_name;
     private String locationLat;
@@ -109,10 +110,24 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
     }
 
 
+    public void useCamera(View view){
+        Intent cameraIntent = new Intent(context, CameraActivity.class);
+        //String[] msg_out = new String[4];
+        //msg_out = msg;
+        /*msg[0] = email;
+        msg[1] = nameofStream;
+        msg[2] = locationLat;
+        msg[3] = locationLong;*/
+
+        cameraIntent.putExtra(EXTRA_MESSAGE, msg);
+        startActivityForResult(cameraIntent, USE_CAMERA);
+    }
+
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE && data != null && data.getData() != null) {
+        if ((requestCode == PICK_IMAGE && data != null && data.getData() != null)
+            || (requestCode == USE_CAMERA && resultCode == RESULT_OK && data != null)) {
             Uri selectedImage = data.getData();
 
             // User had pick an image.
@@ -158,7 +173,9 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
                         }
                     }
             );
-        }
+        } /*else if (requestCode == USE_CAMERA && resultCode == RESULT_OK && data != null      && data.getData() != null) {
+
+        }*/
     }
 
     private void getUploadURL(final byte[] encodedImage, final String photoCaption){

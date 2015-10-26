@@ -4,16 +4,13 @@
 
     <!-- Permissions -->
 
-
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +18,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.application.Kevin_Wenwen.ConnexUs.Homepage"
+            android:name=".Homepage"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,30 +27,35 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.application.Kevin_Wenwen.ConnexUs.DisplayImages"
+            android:name=".DisplayImages"
             android:label="@string/title_activity_display_images" >
         </activity>
         <activity
-            android:name="com.application.Kevin_Wenwen.ConnexUs.ImageUpload"
+            android:name=".ImageUpload"
             android:label="@string/title_activity_image_upload" >
         </activity>
         <activity
-            android:name="com.application.Kevin_Wenwen.ConnexUs.DisplayMySubscribe"
+            android:name=".DisplayMySubscribe"
             android:label="@string/title_activity_display_mysubscribe" >
         </activity>
-
         <activity
-            android:name="com.application.Kevin_Wenwen.ConnexUs.viewSingleStream"
+            android:name=".viewSingleStream"
             android:label="@string/title_activity_view_singlestream" >
         </activity>
-
         <activity
-            android:name="com.application.Kevin_Wenwen.ConnexUs.Search"
+            android:name=".Search"
             android:label="Search Results" >
         </activity>
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+        <activity
+            android:name=".CameraActivity"
+            android:label="@string/title_activity_camera"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

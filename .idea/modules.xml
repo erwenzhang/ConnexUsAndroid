@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ConnexUs.iml" filepath="$PROJECT_DIR$/ConnexUs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ConnexUsAndroidWen.iml" filepath="$PROJECT_DIR$/ConnexUsAndroidWen.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
