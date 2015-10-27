@@ -172,9 +172,48 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
                         }
                     }
             );
-        } /*else if (requestCode == USE_CAMERA && resultCode == RESULT_OK && data != null      && data.getData() != null) {
+        } else if (requestCode == USE_CAMERA && resultCode == RESULT_OK && data != null      /*&& data.getData() != null*/) {
+            String imageFilePath;
+            Bundle extras = getIntent().getExtras();
+            if(extras == null) {
+                imageFilePath = null;
+            } else {
+                imageFilePath = extras.getString("image_path");
+            }
 
-        }*/
+            // Bitmap imaged created and show thumbnail
+
+            ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
+            final Bitmap bitmapImage = BitmapFactory.decodeFile(imageFilePath);
+            imgView.setImageBitmap(bitmapImage);
+
+            // Enable the upload button once image has been uploaded
+
+            Button uploadButton = (Button) findViewById(R.id.upload_to_server);
+            uploadButton.setClickable(true);
+
+            uploadButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            // Get photo caption
+
+                            EditText text = (EditText) findViewById(R.id.upload_message);
+                            String photoCaption = text.getText().toString();
+
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                            byte[] b = baos.toByteArray();
+                            byte[] encodedImage = Base64.encode(b, Base64.DEFAULT);
+                            String encodedImageStr = encodedImage.toString();
+
+                            getUploadURL(b, photoCaption);
+                        }
+                    }
+            );
+
+        }
     }
 
     private void getUploadURL(final byte[] encodedImage, final String photoCaption){

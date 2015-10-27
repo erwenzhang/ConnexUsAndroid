@@ -35,6 +35,7 @@ public class CameraActivity extends Activity {
     Context context = this;
     private int takePictureClicked = 0;
     private List<byte[]> photoDataList = new ArrayList<byte[]>();
+    private String savedPhotoAbsolutePath;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -144,11 +145,11 @@ public class CameraActivity extends Activity {
 
 
         Intent returnIntent = new Intent();
-        // String streamName = getIntent().getStringExtra("stream_name");
-        // returnIntent.putExtra("stream_name", streamName);
-        // returnIntent.putExtra("imageFile", imageFile);
-        // setResult(RESULT_OK, returnIntent);
-        // finish();
+        String streamName = getIntent().getStringExtra("stream_name");
+        returnIntent.putExtra("stream_name", streamName);
+        returnIntent.putExtra("image_path", savedPhotoAbsolutePath);
+        setResult(RESULT_OK, returnIntent);
+        finish();
     }
 
     public void returnStreams(View view){
@@ -191,6 +192,8 @@ public class CameraActivity extends Activity {
                 outStream.write(data[0]);
                 outStream.flush();
                 outStream.close();
+
+                savedPhotoAbsolutePath = sdCard.getAbsolutePath() + "/ConnexUs" + fileName;
 
                 Log.d(TAG, "onPictureTaken - wrote bytes: " + data.length + " to " + outFile.getAbsolutePath());
 
