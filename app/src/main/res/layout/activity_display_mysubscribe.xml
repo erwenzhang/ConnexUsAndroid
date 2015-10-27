@@ -1,14 +1,14 @@
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context="com.application.Kevin_Wenwen.ConnexUs.DisplayMySubscribe">
+
     <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        tools:context="com.application.Kevin_Wenwen.ConnexUs.DisplayMySubscribe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical">
+        android:scrollbars="vertical"
+        android:fillViewport="true">
         <LinearLayout
             android:orientation="vertical"
         android:layout_width="match_parent"
@@ -36,4 +36,4 @@
         />
     </LinearLayout>
     </ScrollView>
-</LinearLayout>
+

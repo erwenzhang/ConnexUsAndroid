@@ -28,6 +28,11 @@ import android.os.Environment;
 import android.view.KeyEvent;
 
 public class CameraActivity extends Activity {
+<<<<<<< HEAD
+=======
+    public final static String EXTRA_MESSAGE = "MESSAGE IN";
+
+>>>>>>> master
     private static final String TAG = "CameraActivity";
     private Camera mCamera;
     private CameraPreview mPreview;
@@ -35,7 +40,11 @@ public class CameraActivity extends Activity {
     Context context = this;
     private int takePictureClicked = 0;
     private List<byte[]> photoDataList = new ArrayList<byte[]>();
+<<<<<<< HEAD
     private String savedPhotoAbsolutePath;
+=======
+    private String savedPhotoAbsolutePath = "yes";
+>>>>>>> master
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -144,12 +153,15 @@ public class CameraActivity extends Activity {
         new SaveImageTask().execute(data);
 
 
+<<<<<<< HEAD
         Intent returnIntent = new Intent();
         String streamName = getIntent().getStringExtra("stream_name");
         returnIntent.putExtra("stream_name", streamName);
         returnIntent.putExtra("image_path", savedPhotoAbsolutePath);
         setResult(RESULT_OK, returnIntent);
         finish();
+=======
+>>>>>>> master
     }
 
     public void returnStreams(View view){
@@ -193,8 +205,14 @@ public class CameraActivity extends Activity {
                 outStream.flush();
                 outStream.close();
 
+<<<<<<< HEAD
                 savedPhotoAbsolutePath = sdCard.getAbsolutePath() + "/ConnexUs" + fileName;
 
+=======
+                savedPhotoAbsolutePath = sdCard.getAbsolutePath() + "/ConnexUs/" + fileName;
+
+                Log.d("TAGTAGTAG1", savedPhotoAbsolutePath);
+>>>>>>> master
                 Log.d(TAG, "onPictureTaken - wrote bytes: " + data.length + " to " + outFile.getAbsolutePath());
 
                 refreshGallery(outFile);
@@ -203,6 +221,28 @@ public class CameraActivity extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
+<<<<<<< HEAD
+=======
+                Log.d("TAGTAGTAG", "1");
+                Intent returnIntent = new Intent();
+
+                Log.d("TAGTAGTAG", "2");
+                String[] msg = getIntent().getStringArrayExtra(EXTRA_MESSAGE);
+                String streamName = msg[1];
+                String[] msg_out = new String[2];
+                Log.d("TAGTAGTAG", "3");
+                Log.d("TAGTAGTAG0", savedPhotoAbsolutePath);
+                msg_out[0] = streamName;
+                msg_out[1] = savedPhotoAbsolutePath;
+                Log.d("TAGTAGTAG", savedPhotoAbsolutePath);
+                //  returnIntent.putExtra("stream_name", streamName);
+                returnIntent.putExtra(EXTRA_MESSAGE,msg_out);
+
+                Log.d("TAGTAGTAG", savedPhotoAbsolutePath);
+                Log.d("TAGTAGTAG", "5");
+                setResult(RESULT_OK, returnIntent);
+                finish();
+>>>>>>> master
             }
             return null;
         }

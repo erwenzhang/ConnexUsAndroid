@@ -110,7 +110,7 @@ public class Homepage extends ActionBarActivity implements
     private String mLatitudeText = "0";
     private String mLongitudeText = "0";
     //private LocationClient mLocationClient;
-    private LocationRequest mLocationRequest;
+    //private LocationRequest mLocationRequest;
     private Location mLastLocation;
 
     Context context = this;
@@ -147,8 +147,8 @@ public class Homepage extends ActionBarActivity implements
     }
 
     public void onLocationChanged(Location location) {
-        System.out.print("Location wenwen");
-        System.out.print(location.toString());
+        Log.d("Location wenwen", location.toString());
+        //System.out.print();
         mLongitudeText = String.valueOf(location.getLongitude());
         mLatitudeText = String.valueOf(location.getLatitude());
 
@@ -277,11 +277,11 @@ public class Homepage extends ActionBarActivity implements
         mRevokeButton.setEnabled(true);
 
         //location_api
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(1000);
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+     //   mLocationRequest = LocationRequest.create();
+   //     mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+       // mLocationRequest.setInterval(1000);
+      //  LocationServices.FusedLocationApi.requestLocationUpdates(
+        //        mGoogleApiClient, mLocationRequest, this);
 
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
@@ -289,6 +289,7 @@ public class Homepage extends ActionBarActivity implements
         if (mLastLocation != null) {
             mLatitudeText = String.valueOf(mLastLocation.getLatitude());
             mLongitudeText = String.valueOf(mLastLocation.getLongitude());
+
         }
 
 
@@ -478,12 +479,19 @@ public class Homepage extends ActionBarActivity implements
         //if(Homepage.login)
         String[] msg = new String[3];
 
-        System.out.print(Homepage.email);
-        Log.d("WENWENWENWEN", "msg send 2");
+
+        Log.d("WENWENWENWEN", mLatitudeText);
+        Log.d("WENWENWENWEN", mLongitudeText);
+      //  System.out.print(Homepage.email);
+        //System.out.print(mLatitudeText);
+        //System.out.print(mLongitudeText);
+
         msg[0] = Homepage.email;
         msg[1] = mLatitudeText;
         msg[2] = mLongitudeText;
-        intent.putExtra(EXTRA_MESSAGE,msg);
+
+        intent.putExtra(EXTRA_MESSAGE, msg);
+
         startActivity(intent);
     }
 

@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 
     <application
         android:allowBackup="true"
@@ -51,6 +55,10 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+<<<<<<< HEAD
+=======
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+>>>>>>> master
         <activity
             android:name=".CameraActivity"
             android:label="@string/title_activity_camera"

@@ -1,14 +1,21 @@
 package com.application.Kevin_Wenwen.ConnexUs;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -25,6 +32,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.plus.Plus;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -37,16 +46,39 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 
-public class ImageUpload extends ActionBarActivity implements LocationListener{
+public class ImageUpload extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,
+        LocationListener{
+    private static final String TAG = "ConnexUs-Upload";
+    //final int RQS_GooglePlayServices = 1;
+    private static final int STATE_DEFAULT = 0;
+    private static final int STATE_SIGN_IN = 1;
+    private static final int STATE_IN_PROGRESS = 2;
+
+    private static final int RC_SIGN_IN = 0;
+
+    private static final String SAVED_PROGRESS = "sign_in_progress";
+    private int mSignInProgress;
+
+    // Used to store the PendingIntent most recently returned by Google Play
+    // services until the user clicks 'sign in'.
+    private PendingIntent mSignInIntent;
+
+
     public final static String EXTRA_MESSAGE = "MESSAGE IN";
     private static final int PICK_IMAGE = 1;
     private static final int USE_CAMERA = 2;
     private String email;
     private String stream_name;
-    private String locationLat;
-    private String locationLong;
+    private String locationLat = "0";
+    private String locationLong = "0";
+    private Location mLastLocation;
+    private  LocationRequest mLocationRequest;
     private String[] msg;
     Context context = this;
+
+
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,8 +91,9 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
        // System.out.println(msg[3]);
         email = msg[0];
         stream_name = msg[1];
-        locationLat = msg[2];
-        locationLong = msg[3];
+        //locationLat = msg[2];
+       // locationLong = msg[3];
+
 
         // Choose image from library
         TextView uploadTo = (TextView) findViewById(R.id.uploadTo);
@@ -81,6 +114,11 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
                     }
                 }
         );
+        mGoogleApiClient = buildGoogleApiClient();
+        mLocationRequest = createLocationRequest();
+
+
+
     }
 
     @Override
@@ -101,14 +139,125 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
         }
         return super.onOptionsItemSelected(item);
     }
+
+    protected LocationRequest createLocationRequest() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return mLocationRequest;
+    }
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+    }
+
     public void onLocationChanged(Location location) {
-        System.out.print("Location changes wenwen");
+        System.out.print("Location changes wenwen!!");
         System.out.print(location.toString());
         locationLong = String.valueOf(location.getLongitude());
         locationLat = String.valueOf(location.getLatitude());
 
     }
 
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
+    public void onResume() {
+        super.onResume();
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+        }
+    }
+
+    private GoogleApiClient buildGoogleApiClient() {
+        // When we build the GoogleApiClient we specify where connected and
+        // connection failed callbacks should be returned, which Google APIs our
+        // app uses and which OAuth 2.0 scopes our app requests.
+        return new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .build();
+    }
+
+
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+
+
+    public void onConnectionSuspended(int cause) {
+        // The connection to Google Play services was lost for some reason.
+        // We call connect() to attempt to re-establish the connection or get a
+        // ConnectionResult that we can attempt to resolve.
+        mGoogleApiClient.connect();
+    }
+
+    public void onConnectionFailed(ConnectionResult result) {
+        // Refer to the javadoc for ConnectionResult to see what error codes might
+        // be returned in onConnectionFailed.
+        // int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+        //       Log.i("WENWEN0", "IS Available "
+        //             + GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext()));
+        Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
+                + result.getErrorCode());
+        // GooglePlayServicesUtil.getErrorDialog(resultCode,this,RQS_GooglePlayServices ).show();
+
+        if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE) {
+            Log.d("WENWEN", "HERE");
+            // An API requested for GoogleApiClient is not available. The device's current
+            // configuration might not be supported with the requested API or a required component
+            // may not be installed, such as the Android Wear application. You may need to use a
+            // second GoogleApiClient to manage the application's optional APIs.
+        } else if (mSignInProgress != STATE_IN_PROGRESS) {
+            Log.d("WENWEN", "HERE1");
+            // We do not have an intent in progress so we should store the latest
+            // error resolution intent for use when the sign in button is clicked.
+            mSignInIntent = result.getResolution();
+          //  mSignInError = result.getErrorCode();
+
+            if (mSignInProgress == STATE_SIGN_IN) {
+                // STATE_SIGN_IN indicates the user already clicked the sign in button
+                // so we should continue processing errors until the user is signed in
+                // or they click cancel.
+              //  resolveSignInError();
+                System.out.print(STATE_SIGN_IN);
+                Log.d("WENWEN1", "111");
+                System.out.print(mSignInProgress);
+
+            }
+        }
+        Log.d("WENWEN", "HERE3");
+        // In this sample we consider the user signed out whenever they do not have
+        // a connection to Google Play services.
+       // onSignedOut();
+    }
+
+    public void onConnected(Bundle connectionHint) {
+
+
+        startLocationUpdates();
 
     public void useCamera(View view){
         Intent cameraIntent = new Intent(context, CameraActivity.class);
@@ -123,6 +272,27 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
         startActivityForResult(cameraIntent, USE_CAMERA);
     }
 
+
+    /*    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            locationLat = String.valueOf(mLastLocation.getLatitude());
+            locationLong = String.valueOf(mLastLocation.getLongitude());
+        }*/
+    }
+
+    public void useCamera(View view){
+        Intent cameraIntent = new Intent(context, CameraActivity.class);
+        //String[] msg_out = new String[4];
+        //msg_out = msg;
+        /*msg[0] = email;
+        msg[1] = nameofStream;
+        msg[2] = locationLat;
+        msg[3] = locationLong;*/
+
+        cameraIntent.putExtra(EXTRA_MESSAGE, msg);
+        startActivityForResult(cameraIntent, USE_CAMERA);
+    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -173,6 +343,7 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
                     }
             );
         } else if (requestCode == USE_CAMERA && resultCode == RESULT_OK && data != null      /*&& data.getData() != null*/) {
+<<<<<<< HEAD
             String imageFilePath;
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
@@ -181,6 +352,15 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
                 imageFilePath = extras.getString("image_path");
             }
 
+=======
+
+            String imageFilePath;
+            String[] msg_from_camera = data.getStringArrayExtra(EXTRA_MESSAGE);
+            imageFilePath = msg_from_camera[1];
+            Log.d("TAGTAGTAG upload",msg[0]);
+            Log.d("TAGTAGTAG upload",msg[1]);
+            
+>>>>>>> master
             // Bitmap imaged created and show thumbnail
 
             ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
@@ -212,7 +392,10 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
                         }
                     }
             );
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
         }
     }
 
@@ -253,7 +436,9 @@ public class ImageUpload extends ActionBarActivity implements LocationListener{
         params.put("stream_name",stream_name);
         params.put("locationLat",locationLat);
         params.put("locationLong",locationLong);
+        Log.d("LocationLatLo", "lO");
         System.out.println(locationLat);
+        System.out.println(locationLong);
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.post(upload_url, params, new AsyncHttpResponseHandler() {
