@@ -99,7 +99,7 @@ public class DisplayImages extends ActionBarActivity {
                         streams.add(streamList.getString(i));
                         System.out.println(displayCovers.getString(i));
                     }
-                    GridView gridview = (GridView) findViewById(R.id.gridview);
+                    GridViewScrollable gridview = (GridViewScrollable) findViewById(R.id.gridview);
                     gridview.setAdapter(new ImageAdapter(context,coverURLs));
                     gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
