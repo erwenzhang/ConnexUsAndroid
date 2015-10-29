@@ -75,7 +75,7 @@ public class ImageUpload extends ActionBarActivity implements GoogleApiClient.Co
     private  LocationRequest mLocationRequest;
     private String[] msg;
     Context context = this;
-
+    private Button uploadButton;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -83,6 +83,8 @@ public class ImageUpload extends ActionBarActivity implements GoogleApiClient.Co
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_upload);
+        uploadButton = (Button) findViewById(R.id.upload_to_server);
+        uploadButton.setEnabled(false);
 
         Intent intent = getIntent();
         msg = intent.getStringArrayExtra(DisplayImages.EXTRA_MESSAGE);
@@ -163,7 +165,7 @@ public class ImageUpload extends ActionBarActivity implements GoogleApiClient.Co
 
     protected void onPause() {
         super.onPause();
-        stopLocationUpdates();
+        // stopLocationUpdates();
     }
 
     protected void stopLocationUpdates() {
@@ -283,6 +285,7 @@ public class ImageUpload extends ActionBarActivity implements GoogleApiClient.Co
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        uploadButton.setEnabled(true);
         if (requestCode == PICK_IMAGE && data != null && data.getData() != null) {
             Uri selectedImage = data.getData();
 
@@ -301,13 +304,33 @@ public class ImageUpload extends ActionBarActivity implements GoogleApiClient.Co
             // Bitmap imaged created and show thumbnail
 
             ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
-            final Bitmap bitmapImage = BitmapFactory.decodeFile(imageFilePath);
+
+                    // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(imageFilePath, o);
+            // The new size we want to scale to
+            final int REQUIRED_SIZE = 1024;
+            // Find the correct scale value. It should be the power of 2.
+            int width_tmp = o.outWidth, height_tmp = o.outHeight;
+            int scale = 1;
+            while (width_tmp > REQUIRED_SIZE || height_tmp > REQUIRED_SIZE) {
+                width_tmp /= 2;
+                height_tmp /= 2;
+                scale *= 2;
+            }
+
+            // Decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+
+            final Bitmap bitmapImage = BitmapFactory.decodeFile(imageFilePath, o2);
             imgView.setImageBitmap(bitmapImage);
 
             // Enable the upload button once image has been uploaded
 
-            Button uploadButton = (Button) findViewById(R.id.upload_to_server);
-            uploadButton.setClickable(true);
+            // Button uploadButton = (Button) findViewById(R.id.upload_to_server);
+            // uploadButton.setClickable(true);
 
             uploadButton.setOnClickListener(
                     new View.OnClickListener() {
@@ -336,7 +359,7 @@ public class ImageUpload extends ActionBarActivity implements GoogleApiClient.Co
             imageFilePath = msg_from_camera[1];
             Log.d("TAGTAGTAG upload",msg_from_camera[0]);
             Log.d("TAGTAGTAG upload",msg_from_camera[1]);
-            
+
             // Bitmap imaged created and show thumbnail
 
             ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
@@ -345,8 +368,8 @@ public class ImageUpload extends ActionBarActivity implements GoogleApiClient.Co
 
             // Enable the upload button once image has been uploaded
 
-            Button uploadButton = (Button) findViewById(R.id.upload_to_server);
-            uploadButton.setClickable(true);
+
+            // uploadButton.setClickable(true);
 
             uploadButton.setOnClickListener(
                     new View.OnClickListener() {
@@ -380,7 +403,7 @@ public class ImageUpload extends ActionBarActivity implements GoogleApiClient.Co
 
     private void getUploadURL(final byte[] encodedImage, final String photoCaption){
         AsyncHttpClient httpClient = new AsyncHttpClient();
-        String request_url="http://blobstore-1107.appspot.com/getUploadURL";
+        String request_url="http://mini3-test1.appspot.com/getUploadURL";
         //System.out.println(request_url);
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             String upload_url;

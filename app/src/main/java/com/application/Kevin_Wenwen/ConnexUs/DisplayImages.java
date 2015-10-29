@@ -70,16 +70,18 @@ public class DisplayImages extends ActionBarActivity {
         email = msg[0];
 
         if(email != null){
-            my_subscribe.setEnabled(true);
+            my_subscribe.setVisibility(View.VISIBLE);
+            // my_subscribe.setEnabled(true);
             Log.d("wenwen passing msg", email);
         }
 
         else {
-            my_subscribe.setEnabled(false);
+            my_subscribe.setVisibility(View.GONE);
+            // my_subscribe.setEnabled(false);
           //  Log.d("wenwen passing msg", " failed");
         }
       //  final String request_url = "http://aptandroiddemo.appspot.com/viewAllPhotos";
-      final String request_url = "http://blobstore-1107.appspot.com/viewAllPhotos";
+      final String request_url = "http://mini3-test1.appspot.com/viewAllPhotos";
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             @Override
@@ -97,7 +99,7 @@ public class DisplayImages extends ActionBarActivity {
                         streams.add(streamList.getString(i));
                         System.out.println(displayCovers.getString(i));
                     }
-                    GridView gridview = (GridView) findViewById(R.id.gridview);
+                    GridViewScrollable gridview = (GridViewScrollable) findViewById(R.id.gridview);
                     gridview.setAdapter(new ImageAdapter(context,coverURLs));
                     gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -184,5 +186,11 @@ public class DisplayImages extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void viewNearbyPhotos(View view){
+        Intent intent = new Intent(this, NearbyPhotos.class);
+        intent.putExtra("indexes", "0_15");
+        intent.putExtra(EXTRA_MESSAGE, email);
+        startActivity(intent);
+    }
 
 }

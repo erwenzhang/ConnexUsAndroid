@@ -55,6 +55,7 @@ public class viewSingleStream extends ActionBarActivity {
     private Button upload;
     private Button streams_button;
     private Button more_pictures ;
+    private int morePageCount = 0;
 
     Context context = this;
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,7 @@ public class viewSingleStream extends ActionBarActivity {
         upload = (Button)findViewById(R.id.upload);
         streams_button = (Button)findViewById(R.id.streams);
         more_pictures = (Button)findViewById(R.id.morePictures);
-
+        more_pictures.setEnabled(false);
 
         Intent intent = getIntent();
         msg = intent.getStringArrayExtra(EXTRA_MESSAGE);
@@ -86,7 +87,7 @@ public class viewSingleStream extends ActionBarActivity {
 
 
 
-        final String request_url = "http://blobstore-1107.appspot.com/viewSingleStream";
+        final String request_url = "http://mini3-test1.appspot.com/viewSingleStream";
         AsyncHttpClient httpClient = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.put("email",email);
@@ -126,6 +127,9 @@ public class viewSingleStream extends ActionBarActivity {
                     Log.d("display"," length");
                     System.out.print(displayImages.length());
                     System.out.println(displayImages.length());
+                    if (displayImages.length() > 16) {
+                        more_pictures.setEnabled(true);
+                    }
                     for (int i = 0; i < displayImages.length() && i < 16; i++) {
 
                         imageURLs.add(displayImages.getString(i));
@@ -164,17 +168,24 @@ public class viewSingleStream extends ActionBarActivity {
                             new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    morePageCount++;
+                                    more_pictures.setEnabled(false);
+
                                     try{
                                         pre_location = location;
 
-                                    for (int i = location, j = 0; i < displayImages.length() && j < 16; i++, j++) {
+                                        if (displayImages.length() - morePageCount * 16 > 16) {
+                                            more_pictures.setEnabled(true);
+                                        }
 
-                                        location = i + 1;
+                                        for (int i = location, j = 0; i < displayImages.length() && j < 16; i++, j++) {
 
-                                        imageURLs.add(displayImages.getString(i));
-                                        captionList.add(caption.getString(i));
+                                            location = i + 1;
 
-                                    }
+                                            imageURLs.add(displayImages.getString(i));
+                                            captionList.add(caption.getString(i));
+
+                                        }
                                     }
                                     catch (JSONException j){
                                         System.out.println("JSON Error");

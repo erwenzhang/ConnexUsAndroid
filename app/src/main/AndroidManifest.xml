@@ -60,6 +60,10 @@
             android:label="@string/title_activity_camera"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".NearbyPhotos"
+            android:label="@string/title_activity_nearby_photos" >
+        </activity>
     </application>
 
 </manifest>

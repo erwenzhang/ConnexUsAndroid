@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import android.graphics.Bitmap;
@@ -44,12 +45,17 @@ public class Search extends ActionBarActivity {
     Context context = this;
     private int location = 0;
     private int pre_location = 0;
+    private int moreClickedCount = 0;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
         final Button more_results = (Button)findViewById(R.id.moreResults);
+        more_results.setVisibility(View.GONE);
+
+        final TextView responseText = (TextView) this.findViewById(R.id.results);
+
         EditText search_bar = (EditText)findViewById(R.id.search_bar);
         search_bar.setVisibility(View.VISIBLE);
 
@@ -61,7 +67,7 @@ public class Search extends ActionBarActivity {
 
 
 
-        final String request_url = "http://blobstore-1107.appspot.com/search";
+        final String request_url = "http://mini3-test1.appspot.com/search";
         AsyncHttpClient httpClient = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.put("search_item", search_item);
@@ -76,6 +82,13 @@ public class Search extends ActionBarActivity {
                     final JSONArray displayCovers = jObject.getJSONArray("displayCovers");
                     final JSONArray streamList = jObject.getJSONArray("streamList");
                     Log.d("wenwen! ", "searching json successful");
+
+                    String searchResultsMessage = displayCovers.length()+" results for "+ search_item+"\n"+"click on an image to view stream";
+                    responseText.setText(new String(searchResultsMessage));
+
+                    if (displayCovers.length() > 8) {
+                        more_results.setVisibility(View.VISIBLE);
+                    }
                     for (int i = 0; i < displayCovers.length() && i < 8; i++) {
 
                         coverURLs.add(displayCovers.getString(i));
@@ -110,6 +123,10 @@ public class Search extends ActionBarActivity {
                                 @Override
                                 public void onClick(View v) {
                                     try {
+                                        more_results.setVisibility(View.GONE);
+                                        if (displayCovers.length() - (++moreClickedCount) * 8 > 8) {
+                                            more_results.setVisibility(View.VISIBLE);
+                                        }
                                         pre_location = location;
 
                                         for (int i = location, j = 0; i < displayCovers.length() && j < 8; i++, j++) {

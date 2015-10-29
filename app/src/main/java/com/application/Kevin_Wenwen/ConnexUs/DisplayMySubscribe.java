@@ -46,7 +46,7 @@ public class DisplayMySubscribe extends ActionBarActivity {
         email = intent.getStringExtra(DisplayImages.EXTRA_MESSAGE);
 
 
-        final String request_url = "http://blobstore-1107.appspot.com/mySubscribe";
+        final String request_url = "http://mini3-test1.appspot.com/mySubscribe";
         AsyncHttpClient httpClient = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.put("email", email);

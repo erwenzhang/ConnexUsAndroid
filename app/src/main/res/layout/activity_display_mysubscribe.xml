@@ -6,7 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"
-        android:fillViewport="true">
+        android:fillViewport="true"
+    android:background="@drawable/background">
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">

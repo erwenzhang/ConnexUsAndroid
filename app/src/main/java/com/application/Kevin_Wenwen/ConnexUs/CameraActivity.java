@@ -38,12 +38,14 @@ public class CameraActivity extends Activity {
     private int takePictureClicked = 0;
     private List<byte[]> photoDataList = new ArrayList<byte[]>();
     private String savedPhotoAbsolutePath = "yes";
+    private String[] msg_received;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+        msg_received = getIntent().getStringArrayExtra(EXTRA_MESSAGE);
         // Create an instance of Camera
         mCamera = getCameraInstance();
 
@@ -159,15 +161,17 @@ public class CameraActivity extends Activity {
             mCamera.release();
             mCamera = null;
         }
-        Log.d("Cameracamerea","streams2");
-        Intent returnIntent = new Intent();
-       // String[] msg_out = new String[3];
-        //msg_out[0] = "camera";
-   //     returnIntent.putExtra(EXTRA_MESSAGE,msg_out);
+   //      Log.d("Cameracamerea","streams2");
+   //      Intent returnIntent = new Intent();
+   //     // String[] msg_out = new String[3];
+   //      //msg_out[0] = "camera";
+   // //     returnIntent.putExtra(EXTRA_MESSAGE,msg_out);
 
-        setResult(RESULT_CANCELED, returnIntent);
-        finish();
-
+   //      setResult(RESULT_CANCELED, returnIntent);
+   //      finish();
+        Intent intent = new Intent(this, DisplayImages.class);
+        intent.putExtra(EXTRA_MESSAGE, msg_received);
+        startActivity(intent);
 
 
     }
